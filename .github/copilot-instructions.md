@@ -16,6 +16,7 @@
 ## Repo layout (what to edit)
 - Author assets/scripts should live under `assets/` (mapped as `db://assets/*` in `temp/tsconfig.cocos.json`).
   - In this snapshot `assets/` is empty; most content present is generated cache.
+- #file:assets 資料夾中，AI 只修改 Scripts 資料夾內的 TypeScript 檔案；其他的部分，例如 Scene，由人類修改
 - Treat these as **generated** and avoid editing them in PRs unless you’re explicitly regenerating Creator output:
   - `library/` (asset import/cache)
   - `temp/` (TS declarations + packed JS under `temp/programming/...`)
