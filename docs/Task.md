@@ -26,7 +26,7 @@
 
 ### T0.1 設定與常數集中管理（盲注/起始籌碼/規則開關）
 
-- [ ] **[Code][Config]** 建立 `GameConfig`（例如 `assets/Scripts/config/GameConfig.ts`）
+- [x] **[Code][Config]** 建立 `GameConfig`（例如 `assets/Scripts/config/GameConfig.ts`）
 	- `startingStack`（預設 1000）
 	- `smallBlind` / `bigBlind`（預設 5 / 10）
 	- `ante`（預設 0，可開關）
