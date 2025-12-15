@@ -41,7 +41,7 @@
 
 ### T0.2 本機設定存取（local storage）
 
-- [ ] **[Code]** `SettingsService`：讀寫設定、版本升級策略（不相容可重置）
+- [x] **[Code]** `SettingsService`：讀寫設定、版本升級策略（不相容可重置）
 - ✅ 驗收：可保存/載入音量、AI 難度、思考時間、盲注/起始籌碼（Spec §11.1）。
 
 ---
