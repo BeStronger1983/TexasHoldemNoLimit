@@ -50,9 +50,9 @@
 
 ### T0.0 DebugSandbox Scene（讓後續每個 Task 都能先跑 log）
 
-- [ ] **[Human][Test]** 建立 `DebugSandbox` Scene（可放在 `assets/Scenes/DebugSandbox.scene`）
+- [x] **[Human][Test]** 建立 `DebugSandbox` Scene（可放在 `assets/Scenes/DebugSandbox.scene`）
 	- 建立空節點 `Runner`（掛任何 Debug Runner 用）
-- [ ] **[Code][Test]** 建立 `DebugSandboxBootstrap`（或第一個 Runner，例如 `DebugConfigRunner`）
+- [x] **[Code][Test]** 建立 `DebugConfigRunner`
 	- 進入 Scene 後自動 `console.log` 目前 `GameConfig` 與 `SettingsService` 載入值
 - ✅ 驗收（Scene）：打開 `DebugSandbox` → Play → Console 看到設定值被印出（可重複）。
 	- ✅ 驗收（Scene）：打開 `DebugSandbox` → Play → Console 看到設定值被印出（可重複）（對照：Spec §11.1、§11.2、§11.4）。

@@ -1,6 +1,6 @@
 import { sys } from 'cc';
 
-import { GameConfig, type AiDifficulty } from '../config/GameConfig';
+import { GameConfig, type AiDifficulty } from '../Config/GameConfig';
 
 export interface AudioSettings {
 	bgmVolume: number; // 0..1
