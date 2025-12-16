@@ -103,11 +103,11 @@
 
 ### T1.2 基礎資料結構（純邏輯）
 
-- [ ] **[Code]** `Card` / `Deck`（52 張、洗牌、draw）
-- [ ] **[Code]** `Player` / `PlayerStatus`（Active/Folded/AllIn/Out）
-- [ ] **[Code]** `Action` / `ActionType`（Fold/Check/Call/Bet/Raise/AllIn）
-- [ ] **[Code]** `Table`（9 seats，可為空；communityCards；button/sb/bb；street；actionState；potManager）
-- [ ] **[Code]** `GameEvent`（供 UI 顯示與 Debug log，Spec §9.2、§10.2、§11.4）
+- [x] **[Code]** `Card` / `Deck`（52 張、洗牌、draw）
+- [x] **[Code]** `Player` / `PlayerStatus`（Active/Folded/AllIn/Out）
+- [x] **[Code]** `Action` / `ActionType`（Fold/Check/Call/Bet/Raise/AllIn）
+- [x] **[Code]** `Table`（9 seats，可為空；communityCards；button/sb/bb；street；actionState；potManager）
+- [x] **[Code]** `GameEvent`（供 UI 顯示與 Debug log，Spec §9.2、§10.2、§11.4）
 - ✅ 驗收：模型層不依賴 Cocos 節點；可在純 TS 環境被呼叫。
 	- ✅ 驗收（Scene）：在 `DebugModel` 掛 Runner 並印出
 		- 新 Deck 洗牌後前 10 張牌（或 draw 序列）
