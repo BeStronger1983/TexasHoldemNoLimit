@@ -13,8 +13,6 @@ export interface GameConfigData {
 	aiThinkTimeMsMax: number;
 	animationSpeed: number;
 	skipAnimations: boolean;
-	debugSeedEnabled: boolean;
-	debugSeed: number;
 	logEnabled: boolean;
 	schemaVersion: number;
 }
@@ -32,8 +30,6 @@ export const GameConfig: Readonly<GameConfigData> = Object.freeze({
 	aiThinkTimeMsMax: 1200,
 	animationSpeed: 1,
 	skipAnimations: false,
-	debugSeedEnabled: false,
-	debugSeed: 1,
 	logEnabled: true,
 	schemaVersion: 1,
 });

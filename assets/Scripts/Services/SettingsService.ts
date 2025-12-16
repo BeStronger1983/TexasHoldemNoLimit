@@ -21,20 +21,14 @@ export interface AiSettings {
 	thinkTimeMsMax: number;
 }
 
-export interface DebugSettings {
-	seedEnabled: boolean;
-	seed: number;
-}
-
-export interface SettingsDataV1 {
-	schemaVersion: 1;
+export interface SettingsDataV2 {
+	schemaVersion: 2;
 	audio: AudioSettings;
 	gameplay: GameplaySettings;
 	ai: AiSettings;
-	debug: DebugSettings;
 }
 
-export type SettingsData = SettingsDataV1;
+export type SettingsData = SettingsDataV2;
 
 export interface IKeyValueStorage {
 	getItem(key: string): string | null;
@@ -55,7 +49,7 @@ class SysLocalStorage implements IKeyValueStorage {
 }
 
 const STORAGE_KEY = 'TexasHoldemNoLimit.Settings';
-const CURRENT_SCHEMA_VERSION = 1 as const;
+const CURRENT_SCHEMA_VERSION = 2 as const;
 
 function clamp01(value: number): number {
 	if (!Number.isFinite(value)) return 1;
@@ -125,17 +119,20 @@ function sanitizeSettings(candidate: Partial<SettingsData> | null | undefined): 
 		}
 	}
 
-	// debug
-	if (anyCandidate.debug && typeof anyCandidate.debug === 'object') {
-		base.debug.seedEnabled = toSafeBool(anyCandidate.debug.seedEnabled, base.debug.seedEnabled);
-		base.debug.seed = Math.max(0, toSafeInt(anyCandidate.debug.seed, base.debug.seed));
-	}
-
 	return base;
 }
 
+function migrateV1ToV2(raw: any): Partial<SettingsDataV2> {
+	// Drop all legacy debug/seed fields.
+	return {
+		audio: raw?.audio,
+		gameplay: raw?.gameplay,
+		ai: raw?.ai,
+	} as Partial<SettingsDataV2>;
+}
+
 const DEFAULT_SETTINGS: SettingsData = {
-	schemaVersion: 1,
+	schemaVersion: 2,
 	audio: {
 		bgmVolume: 1,
 		sfxVolume: 1,
@@ -151,10 +148,6 @@ const DEFAULT_SETTINGS: SettingsData = {
 		thinkTimeEnabled: GameConfig.aiThinkTimeEnabled,
 		thinkTimeMsMin: GameConfig.aiThinkTimeMsMin,
 		thinkTimeMsMax: GameConfig.aiThinkTimeMsMax,
-	},
-	debug: {
-		seedEnabled: GameConfig.debugSeedEnabled,
-		seed: GameConfig.debugSeed,
 	},
 };
 
@@ -179,12 +172,19 @@ export class SettingsService {
 			const parsed = JSON.parse(raw) as any;
 			const schemaVersion = toSafeInt(parsed?.schemaVersion, 0);
 
-			// Version strategy: only V1 exists now; future versions can migrate here.
-			if (schemaVersion !== CURRENT_SCHEMA_VERSION) {
-				return this.reset();
+			if (schemaVersion === CURRENT_SCHEMA_VERSION) {
+				return sanitizeSettings(parsed as Partial<SettingsData>);
 			}
 
-			return sanitizeSettings(parsed as Partial<SettingsData>);
+			// Migrate legacy schemaVersion=1 by dropping debug/seed fields.
+			if (schemaVersion === 1) {
+				const migrated = sanitizeSettings(migrateV1ToV2(parsed));
+				this.save(migrated);
+				return migrated;
+			}
+
+			// Unknown version -> reset.
+			return this.reset();
 		} catch {
 			return this.reset();
 		}
@@ -238,19 +238,6 @@ export class SettingsService {
 			...current,
 			ai: {
 				...current.ai,
-				...patch,
-			},
-		};
-		this.save(next);
-		return this.load();
-	}
-
-	updateDebug(patch: Partial<DebugSettings>): SettingsData {
-		const current = this.load();
-		const next: SettingsData = {
-			...current,
-			debug: {
-				...current.debug,
 				...patch,
 			},
 		};

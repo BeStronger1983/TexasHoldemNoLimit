@@ -16,7 +16,7 @@
 
 ## DoD（Definition of Done）
 
-- 固定 seed 下可重現：洗牌、入座、人類座位、AI 行為與結果一致（Spec §10、§14）。
+ - 不要求結果可重現（可接受每次執行結果不同）。
 - 達成 Spec 驗收情境：正常四街、任一街全員棄牌、至少 1 個邊池、至少 3 層邊池、Heads-up 正確順序（Spec §14）。
 - UI 不允許非法操作：按鈕狀態正確（Spec §8.5）。
 
@@ -39,7 +39,7 @@
 - **Log 規範（方便比對可重現性）**
 
 - **Log 規範（方便比對可重現性；對照：Spec §10.1、§10.2、§11.4）**
-	- 每次跑都要先印：`[TEST] <TaskId> seed=<seed> version=<schemaVersion>`
+	- 每次跑都要先印：`[TEST] <TaskId> schemaVersion=<schemaVersion>`
 	- 所有 RNG 相關輸出都要可複製比對（例如固定印前 N 個數、抽牌序列、座位分配）。
 
 > 注意：Scene/Prefab/節點佈局仍由人類在 Editor 內建立與綁定；本文件會把每個 Task 的「需要哪個 Scene」與「如何驗收」寫清楚。
@@ -58,7 +58,6 @@
 	- `reopenOnShortAllinRaise`（預設 false，Spec §5.7）
 	- `aiDifficulty`、`aiThinkTimeMsMin/Max`、`aiThinkTimeEnabled`（Spec §7.2.5）
 	- `animationSpeed` 或 `skipAnimations`（Spec §8.4）
-	- `debugSeedEnabled` / `debugSeed`（Spec §10）
 	- `logEnabled`（Spec §11.4）
 	- `schemaVersion`（Spec §11.2）
 - ✅ 驗收：所有規則參數僅從 `GameConfig` 讀取，不散落硬編碼。
@@ -87,7 +86,7 @@
 ### T1.0 Debug Scenes（Milestone 1 專用）
 
 - [x] **[Human][Test]** 建立下列 Debug Scenes（可先只做 `DebugRng`，其他可視需要追加）：
-	- `DebugRng`：只驗 RNG（seed、序列）
+	- `DebugRng`：只驗 RNG（序列）
 	- `DebugModel`：驗 `Card/Deck/Player/Table` 的資料正確性
 	- `DebugSession`：驗入座/hand 初始化（座位、button、盲注、籌碼變化）
 - ✅ 驗收（Scene）：每個 Scene Play 後至少能印出一行 `[TEST] <TaskId> ...`，避免空場景。
@@ -95,15 +94,12 @@
 
 ### T1.1 RNG 抽象與實作
 
-- [ ] **[Code]** 定義 `IRng`（例如 `nextInt(maxExclusive)`、`nextFloat()`）
-- [ ] **[Code]** 實作：
-	- `SeededRng`（固定 seed 可重現）
+- [x] **[Code]** 定義 `IRng`（例如 `nextInt(maxExclusive)`、`nextFloat()`）
+- [x] **[Code]** 實作：
 	- `SecureRng`（Web 用 `crypto.getRandomValues`；不可得則退回 `Math.random`，但要能被測試模式替換）
 - ✅ 驗收：所有會影響結果的隨機（入局人數、座位、洗牌、AI 決策擾動）都只走同一個可注入 RNG（Spec §10.1）。
 	- ✅ 驗收（Scene）：在 `DebugRng` 掛 `DebugRngRunner`
-		- 固定 seed（例如 123）印出：前 20 個 `nextInt(52)` 與前 5 個 `nextFloat()`
-		- 連續 Play 3 次輸出必須完全一致；換 seed 輸出必須改變
-		- 把 `SecureRng` 也跑一次（不要求可重現，但要能被替換/注入成 `SeededRng` 以便測試模式）（對照：Spec §10.1）。
+		- 跑一次 `SecureRng`：印出前 20 個 `nextInt(52)` 與前 5 個 `nextFloat()`（對照：Spec §10.1）。
 
 ### T1.2 基礎資料結構（純邏輯）
 
@@ -123,23 +119,22 @@
 - [ ] **[Code]** Session 開始：隨機 N∈[2,9]；恰好 1 人類；座位隨機；AI 命名（Spec §5.1、§14）
 - [ ] **[Code]** Hand 開始：Button（首手隨機；之後順時針），扣 ante、扣盲注（Spec §6.1）
 - [ ] **[Code]** 籌碼歸零：AI 離桌；人類歸零 Session 結束失敗；只剩人類則勝利（Spec §6.1 step 11–12、§14）
-- ✅ 驗收：固定 seed 下，每次 Session 產生同樣的入座結果。
-	- ✅ 驗收（Scene）：在 `DebugSession` 掛 Runner，固定 seed 印出
+
+- ✅ 驗收（Scene）：在 `DebugSession` 掛 Runner，印出
 		- N、人類座位 index、每位玩家 name/stack/seat
 		- 首手 button/sb/bb，並印出扣盲注後 stack
-		- 連續 Play 3 次輸出一致（對照：Spec §5.1、§6.1、§10.1、§12、§14）。
+		-（對照：Spec §5.1、§6.1、§12、§14）。
 
 ### T1.4 Debug/Replay 記錄輸出
 
 - [ ] **[Code][Test]** Debug 模式輸出（可寫到 console 或本機檔案/儲存）：
-	- `seed`
 	- 玩家數與座位/人類座位
 	- 洗牌後牌序或每次 draw 序列
 	- 行動序列（含金額）
-- ✅ 驗收：可用同一 seed 重播得到相同行為與結果（Spec §10.2、§14）。
-	- ✅ 驗收（Scene）：在 `DebugSandbox` 或 `DebugSession` 透過 Runner
-		- 產生一份可複製的 replay log（seed + 入座 + 抽牌序列 + action 序列）
-		- 以同 seed 再跑一次，比對 log 完全一致（至少在 console 中可目視比對）（對照：Spec §10.2、§11.4）。
+
+- ✅ 驗收（Scene）：在 `DebugSandbox` 或 `DebugSession` 透過 Runner
+	- 產生一份可複製的 replay log（入座 + 抽牌序列 + action 序列）
+	-（不要求重播一致；對照：Spec §11.4）。
 
 ---
 
@@ -171,9 +166,9 @@
 - [ ] **[Code]** 新 Deck、洗牌、依順時針發 2 張手牌（Spec §5.2、§5.4）
 - [ ] **[Code]** Flop/Turn/River 前燒牌（預設開啟，可配置）
 - ✅ 驗收：公共牌張數正確；burn 開關會影響 draw 序列且可重現。
-	- ✅ 驗收（Scene）：在 `DebugHandFlow` 固定 seed
+	- ✅ 驗收（Scene）：在 `DebugHandFlow`
 		- burn 開：印出 burn 的牌 + flop/turn/river
-		- burn 關：同 seed 印出另一組公共牌（必須不同），且每次重跑一致（對照：Spec §5.4、§10.1）。
+		- burn 關：再跑一次，印出另一組公共牌（通常不同；對照：Spec §5.4）。
 
 ### T2.3 行動順序（含 Heads-up 特例）
 
@@ -200,7 +195,7 @@
 	- 所有未 all-in 者行動完成且對齊最高下注，且最後加注者後面都已回應
 	- 全員 all-in 則跳過後續下注直補牌
 - ✅ 驗收：任意街都能正確結束並進入下一狀態，不多走/不漏走。
-	- ✅ 驗收（Scene）：在 `DebugBetting` 提供 3 組可重現腳本（固定 seed 或固定 action list）
+	- ✅ 驗收（Scene）：在 `DebugBetting` 提供 3 組可重現腳本（固定 action list）
 		- 只剩 1 人未棄牌立即結束
 		- 正常 bet/raise/call 對齊後結束
 		- 全員 all-in 直接補牌到攤牌（中間不再詢問動作）（對照：Spec §5.5、§5.6、§5.7、§12）。
@@ -233,7 +228,7 @@
 - ✅ 驗收：不可整除時餘籌碼分配可重現且符合規則。
 	- ✅ 驗收（Scene）：在 `DebugHandFlow` 或 `DebugPot` 跑固定案例
 		- 產生 odd chip（例如 pot=101 分 2 人）
-		- 印出從 BTN 左手邊起順時針分配順序與最後每人拿到的籌碼（固定 seed 重跑一致）（對照：Spec §8.6、§15、§14）。
+		- 印出從 BTN 左手邊起順時針分配順序與最後每人拿到的籌碼（對照：Spec §8.6、§15、§14）。
 
 ---
 
@@ -242,16 +237,16 @@
 ### T3.0 Debug Scenes（Milestone 3 專用）
 
 - [ ] **[Human][Test]** 建立 `DebugAI` Scene
-	- Runner 能在固定 seed 下跑 N 次決策並印出（不必接完整牌桌 UI）
+	- Runner 能跑 N 次決策並印出（不必接完整牌桌 UI）
 	- ✅ 驗收（Scene）：Play 後印出至少 1 次 AI 決策（action + amount）（對照：Spec §7.2.1、§7.2.2、§10.1）。
 
 ### T3.1 AI 難度與決策介面
 
 - [ ] **[Code][Config]** 2–3 檔難度配置（Spec §7.2.1）
 - [ ] **[Code]** `BotDecisionInput`：手牌/公共牌/位置/street/toCall/minRaise/pot/effective stack/歷史下注（Spec §7.2.2）
-- ✅ 驗收：同一難度 + 同一 seed 下 AI 決策一致。
-	- ✅ 驗收（Scene）：在 `DebugAI` 固定 seed，對同一 `BotDecisionInput` 連跑 10 次
-		- 輸出必須一致（或若設計上允許擾動，也必須把擾動 RNG 綁在同一 seed 並可重播）（對照：Spec §7.2.1、§10.1、§14）。
+
+- ✅ 驗收（Scene）：在 `DebugAI` 對同一 `BotDecisionInput` 連跑 10 次
+	- 輸出皆為合法動作（對照：Spec §7.2.1、§14）。
 
 ### T3.2 Preflop 起手牌簡化表（bucket）
 
@@ -340,13 +335,14 @@
 
 ## Milestone 5：驗收情境與回歸（可重現）
 
-### T5.1 固定 seed 的驗收腳本/模式
+### T5.1 驗收腳本/模式
 
-- [ ] **[Code][Test]** 提供「Debug 模式一鍵開局」：輸入 seed → 直接開始一手/一個 session
-- ✅ 驗收：同 seed 每次結果一致（Spec §14）。
+### T5.1 驗收腳本/模式
+
+- [ ] **[Code][Test]** 提供「Debug 模式一鍵開局」：直接開始一手/一個 session
+
 	- ✅ 驗收（Scene）：在 `MainMenu` 或 `DebugSandbox`
-		- 輸入 seed（或在腳本欄位填 seed）→ 一鍵開局 → 自動跑到 Hand Summary
-		- 重跑同 seed，輸出的摘要（座位/公共牌/行動序列/派彩）一致（對照：Spec §10.2、§14）。
+		- 一鍵開局 → 自動跑到 Hand Summary（對照：Spec §14）。
 
 ### T5.2 Spec 驗收情境覆蓋
 
