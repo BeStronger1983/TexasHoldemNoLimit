@@ -185,12 +185,12 @@
 
 ### T2.4 下注規則與最小加注（No-Limit）
 
-- [ ] **[Code]** 合法動作集計算：Fold/Check/Call/Bet/Raise/All-in（Spec §5.5、§7.1、§8.3）
-- [ ] **[Code]** 金額規則：
+- [x] **[Code]** 合法動作集計算：Fold/Check/Call/Bet/Raise/All-in（Spec §5.5、§7.1、§8.3）
+- [x] **[Code]** 金額規則：
 	- `toCall`、`currentBet`、`lastRaiseIncrement`、`minRaise` 計算
 	- All-in 作為 Bet/Raise/Call 特例
 	- All-in 不足最小加注增量時的 reopen 行為（預設不 reopen，Spec §5.7）
-- [ ] **[Code]** 一輪下注結束條件（Spec §5.6）：
+- [x] **[Code]** 一輪下注結束條件（Spec §5.6）：
 	- 只剩 1 位未棄牌
 	- 所有未 all-in 者行動完成且對齊最高下注，且最後加注者後面都已回應
 	- 全員 all-in 則跳過後續下注直補牌
