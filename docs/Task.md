@@ -86,7 +86,7 @@
 
 ### T1.0 Debug Scenes（Milestone 1 專用）
 
-- [ ] **[Human][Test]** 建立下列 Debug Scenes（可先只做 `DebugRng`，其他可視需要追加）：
+- [x] **[Human][Test]** 建立下列 Debug Scenes（可先只做 `DebugRng`，其他可視需要追加）：
 	- `DebugRng`：只驗 RNG（seed、序列）
 	- `DebugModel`：驗 `Card/Deck/Player/Table` 的資料正確性
 	- `DebugSession`：驗入座/hand 初始化（座位、button、盲注、籌碼變化）
