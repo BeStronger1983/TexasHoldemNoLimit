@@ -116,9 +116,9 @@
 
 ### T1.3 Session/Hand 初始化（入座與離桌）
 
-- [ ] **[Code]** Session 開始：隨機 N∈[2,9]；恰好 1 人類；座位隨機；AI 命名（Spec §5.1、§14）
-- [ ] **[Code]** Hand 開始：Button（首手隨機；之後順時針），扣 ante、扣盲注（Spec §6.1）
-- [ ] **[Code]** 籌碼歸零：AI 離桌；人類歸零 Session 結束失敗；只剩人類則勝利（Spec §6.1 step 11–12、§14）
+- [x] **[Code]** Session 開始：隨機 N∈[2,9]；恰好 1 人類；座位隨機；AI 命名（Spec §5.1、§14）
+- [x] **[Code]** Hand 開始：Button（首手隨機；之後順時針），扣 ante、扣盲注（Spec §6.1）
+- [x] **[Code]** 籌碼歸零：AI 離桌；人類歸零 Session 結束失敗；只剩人類則勝利（Spec §6.1 step 11–12、§14）
 
 - ✅ 驗收（Scene）：在 `DebugSession` 掛 Runner，印出
 		- N、人類座位 index、每位玩家 name/stack/seat
