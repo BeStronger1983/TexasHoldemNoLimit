@@ -142,7 +142,7 @@
 
 ### T2.0 Debug Scenes（Milestone 2 專用）
 
-- [ ] **[Human][Test]** 建立下列 Debug Scenes（可逐步建立，不要求一次到位）：
+- [x] **[Human][Test]** 建立下列 Debug Scenes（可逐步建立，不要求一次到位）：
 	- `DebugHandFlow`：跑一手從發牌到結束（先不接 UI，只印狀態與事件）
 	- `DebugBetting`：只跑一輪下注與合法動作集
 	- `DebugPot`：只驗 side pots 與 eligible
