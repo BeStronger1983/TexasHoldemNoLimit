@@ -48,15 +48,6 @@
 
 ## Milestone 0：專案骨架與配置
 
-### T0.0 DebugSandbox Scene（讓後續每個 Task 都能先跑 log）
-
-- [x] **[Human][Test]** 建立 `DebugSandbox` Scene（可放在 `assets/Scenes/DebugSandbox.scene`）
-	- 建立空節點 `Runner`（掛任何 Debug Runner 用）
-- [x] **[Code][Test]** 建立 `DebugConfigRunner`
-	- 進入 Scene 後自動 `console.log` 目前 `GameConfig` 與 `SettingsService` 載入值
-- ✅ 驗收（Scene）：打開 `DebugSandbox` → Play → Console 看到設定值被印出（可重複）。
-	- ✅ 驗收（Scene）：打開 `DebugSandbox` → Play → Console 看到設定值被印出（可重複）（對照：Spec §11.1、§11.2、§11.4）。
-
 ### T0.1 設定與常數集中管理（盲注/起始籌碼/規則開關）
 
 - [x] **[Code][Config]** 建立 `GameConfig`（例如 `assets/Scripts/config/GameConfig.ts`）
@@ -79,6 +70,15 @@
 - ✅ 驗收：可保存/載入音量、AI 難度、思考時間、盲注/起始籌碼（Spec §11.1）。
 	- ✅ 驗收（Scene）：在 `DebugSandbox` 提供一次「寫入→讀回」的測試（至少印出寫入前/後的 key-values）。
 		-（對照：Spec §11.1、§11.2）
+
+### T0.3 DebugSandbox Scene（讓後續每個 Task 都能先跑 log）
+
+- [x] **[Human][Test]** 建立 `DebugSandbox` Scene（可放在 `assets/Scenes/DebugSandbox.scene`）
+	- 建立空節點 `Runner`（掛任何 Debug Runner 用）
+- [x] **[Code][Test]** 建立 `DebugConfigRunner`
+	- 進入 Scene 後自動 `console.log` 目前 `GameConfig` 與 `SettingsService` 載入值
+- ✅ 驗收（Scene）：打開 `DebugSandbox` → Play → Console 看到設定值被印出（可重複）。
+	- ✅ 驗收（Scene）：打開 `DebugSandbox` → Play → Console 看到設定值被印出（可重複）（對照：Spec §11.1、§11.2、§11.4）。
 
 ---
 
