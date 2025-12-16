@@ -151,11 +151,11 @@
 
 ### T2.1 牌局狀態機（State Machine）
 
-- [ ] **[Code]** 明確狀態列舉與轉移（Spec §6.2）：
+- [x] **[Code]** 明確狀態列舉與轉移（Spec §6.2）：
 	- `Boot` → `MainMenu` → `TableSetup` → `PostingBlinds` → `DealHoleCards` →
 		`BettingPreflop` → `DealFlop` → `BettingFlop` → `DealTurn` → `BettingTurn` →
 		`DealRiver` → `BettingRiver` → `Showdown` → `Payout` → `HandSummary` → `NextHandOrExit`
-- [ ] **[Code]** 狀態必須有 guards / 退出條件 / 事件觸發點，避免 UI/AI/動畫互相搶（Spec §6.2、§8.4）
+- [x] **[Code]** 狀態必須有 guards / 退出條件 / 事件觸發點，避免 UI/AI/動畫互相搶（Spec §6.2、§8.4）
 - ✅ 驗收：任何一局不會卡死（無可行事件時仍能前進或安全結束回主選單）。
 	- ✅ 驗收（Scene）：在 `DebugHandFlow` 跑 1 手牌局
 		- console 逐步印出狀態轉移序列（至少涵蓋到 Flop/Turn/River 或提早結束）
