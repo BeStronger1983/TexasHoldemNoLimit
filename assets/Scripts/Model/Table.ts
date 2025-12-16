@@ -1,4 +1,5 @@
 import type { Card } from './Card';
+import type { Deck } from './Deck';
 import type { Player } from './Player';
 
 export enum Street {
@@ -19,6 +20,8 @@ export class Table {
 	readonly maxSeats: number;
 	readonly seats: Seat[];
 
+	deck: Deck | null;
+	burnCards: Card[];
 	communityCards: Card[];
 
 	buttonSeatIndex: number | null;
@@ -35,6 +38,8 @@ export class Table {
 		this.maxSeats = Math.max(2, Math.trunc(init?.maxSeats ?? 9));
 		this.seats = Array.from({ length: this.maxSeats }, () => null);
 
+		this.deck = null;
+		this.burnCards = [];
 		this.communityCards = [];
 		this.buttonSeatIndex = null;
 		this.smallBlindSeatIndex = null;

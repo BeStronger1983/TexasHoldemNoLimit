@@ -163,8 +163,8 @@
 
 ### T2.2 發牌流程（含燒牌可配置）
 
-- [ ] **[Code]** 新 Deck、洗牌、依順時針發 2 張手牌（Spec §5.2、§5.4）
-- [ ] **[Code]** Flop/Turn/River 前燒牌（預設開啟，可配置）
+- [x] **[Code]** 新 Deck、洗牌、依順時針發 2 張手牌（Spec §5.2、§5.4）
+- [x] **[Code]** Flop/Turn/River 前燒牌（預設開啟，可配置）
 - ✅ 驗收：公共牌張數正確；burn 開關會影響 draw 序列且可重現。
 	- ✅ 驗收（Scene）：在 `DebugHandFlow`
 		- burn 開：印出 burn 的牌 + flop/turn/river

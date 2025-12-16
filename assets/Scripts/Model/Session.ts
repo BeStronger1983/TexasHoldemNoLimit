@@ -4,12 +4,18 @@ import { GameConfig } from '../Config/GameConfig';
 import type { GameplaySettings } from '../Services/SettingsService';
 import { Player, PlayerStatus, type PlayerInit } from './Player';
 import { Table } from './Table';
+import { Street } from './Table';
 
 export type SessionResult = 'InProgress' | 'HumanBusted' | 'HumanWon';
 
 export interface SessionInit {
 	maxSeats?: number;
 	gameplay?: GameplaySettings;
+	burnCardEnabled?: boolean;
+}
+
+export interface SessionRules {
+	burnCardEnabled: boolean;
 }
 
 export interface HandStartInfo {
@@ -39,6 +45,7 @@ export class Session {
 	readonly table: Table;
 	readonly rng: IRng;
 	readonly gameplay: GameplaySettings;
+	readonly rules: SessionRules;
 
 	players: Player[];
 	handNumber: number;
@@ -48,6 +55,9 @@ export class Session {
 	constructor(rng: IRng, init?: SessionInit) {
 		this.rng = rng;
 		this.table = new Table({ maxSeats: init?.maxSeats ?? 9 });
+		this.rules = Object.freeze({
+			burnCardEnabled: init?.burnCardEnabled ?? GameConfig.burnCardEnabled,
+		});
 
 		// Prefer SettingsService gameplay values when provided; fall back to GameConfig.
 		const startingStack = Math.max(
@@ -165,7 +175,10 @@ export class Session {
 
 		// Reset per-hand state.
 		for (const p of this.players) p.resetForNewHand();
+		this.table.deck = null;
+		this.table.burnCards = [];
 		this.table.communityCards = [];
+		this.table.street = Street.Preflop;
 
 		this.handNumber++;
 
