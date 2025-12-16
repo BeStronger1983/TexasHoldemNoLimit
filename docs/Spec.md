@@ -47,6 +47,20 @@
 - Small Blind（SB）/ Big Blind（BB）：小盲/大盲。
 - All-in：玩家押上其剩餘全部籌碼。
 - Side Pot：邊池。
+	- 邊池是指：當有 1 位以上玩家在下注過程中因籌碼不足而 All-in（無法再投入更多），但其他玩家仍能繼續投入時，底池會依「每位玩家在本手牌的總投入額（contribution）」被切成多個獨立的池。
+	- 目的：確保每位 All-in 玩家只會競逐「他有投入到的那一段金額」所形成的池，避免出現用較少籌碼去贏取別人額外投入的部分。
+	- 核心概念（以投入層級切分）：
+		- 先找出仍在局（未棄牌）的玩家各自於本手牌的總投入額，將投入額由小到大排序。
+		- 以最小投入額為第一層，從每位仍在局玩家的投入中各取出同樣的金額，形成「主池（Main Pot）」；只有「對該層有投入且未棄牌」的玩家才有資格競逐。
+		- 若仍有玩家的投入額高於此層，超出的部分進入下一層，形成「邊池（Side Pot #1、#2…）」；每一層的競逐者只包含「在該層仍有投入且未棄牌」的玩家。
+	- 直覺範例（3 人）：
+		- A 全下 30、B 投入 80、C 投入 80（皆未棄牌）。
+		- 主池：每人先各 30 → 30×3 = 90，競逐者：A、B、C。
+		- 邊池 #1：剩餘投入 B 50、C 50 → 50×2 = 100，競逐者：B、C。
+		- 結算時：A 只能贏主池 90；邊池 #1 只在 B 與 C 之間比較。
+	- 重要補充：
+		- 若某玩家在形成邊池前已棄牌，則他雖然已投入的籌碼仍留在各池金額中，但他不再具備任何池的競逐資格。
+		- 當多人在不同金額 All-in 時，可能形成多層邊池；每層池都必須獨立決定勝者並獨立分配。
 
 ## 5. 核心遊戲規則
 
@@ -73,6 +87,8 @@
 - `blindIncreasePolicy`：固定盲注（第一版採固定盲注）。
 
 ### 5.4 發牌與公共牌
+
+燒牌（Burn card）指的是：在發出公共牌前，先從牌堆頂抽出 1 張牌並「不給任何玩家、也不翻開作為公共牌」，直接丟棄（視為本手不再使用）。此規則用來降低作弊/預测牌序的影響並貼近實際牌局流程。
 
 - 每位在局玩家獲得 2 張手牌（Hole Cards）。
 - 公共牌依序：Flop 3 張、Turn 1 張、River 1 張。
@@ -148,24 +164,39 @@
 
 必須以明確狀態機實作，避免 UI/AI/動畫互相打架。
 
+本章節用「白話」定義每個狀態的意思：
+
+- 一個 `GameState` 代表「目前遊戲邏輯正在做哪一段流程」。
+- 進入某狀態後，只允許該狀態負責的行為（例如：扣盲、發牌、等待玩家行動、結算）。
+- 狀態的退出（轉移到下一個狀態）必須由明確條件觸發（例如：動畫播完、玩家做出動作、AI 思考完成、或輪次結束）。
+
+下面每個狀態以「目的 / 何時進入 / 何時離開」描述（第一版先以可玩、可測為主）：
+
 建議狀態：
 
-- `Boot`
-- `MainMenu`
-- `TableSetup`（決定人數、座位、起始籌碼、Button）
-- `PostingBlinds`（含 ante）
-- `DealHoleCards`
-- `BettingPreflop`
-- `DealFlop`
-- `BettingFlop`
-- `DealTurn`
-- `BettingTurn`
-- `DealRiver`
-- `BettingRiver`
-- `Showdown`
-- `Payout`（分池發籌碼）
-- `HandSummary`（結果顯示）
-- `NextHandOrExit`
+- `Boot`：初始化遊戲（讀設定/初始化 RNG/建立必要服務）。進入：App 啟動。離開：初始化完成後進 `MainMenu`。
+- `MainMenu`：主選單等待使用者開始/離開/進設定。進入：Boot 完成或一個 Session 結束回到主選單。離開：點「開始遊戲」→ `TableSetup`。
+- `TableSetup`：建立本次 Session / 本手牌開局的桌面資料（玩家數 2–9、座位、人類座位、起始籌碼、Button/SB/BB 指派）。進入：開始遊戲或上一手結束準備下一手。離開：桌面資料就緒 → `PostingBlinds`。
+- `PostingBlinds`：扣除 ante（若啟用）與盲注（SB/BB），並把投入記錄到 contribution（為底池與邊池計算做準備）。進入：桌面就緒。離開：盲注/ante 都處理完 → `DealHoleCards`。
+- `DealHoleCards`：洗牌並發每位在局玩家 2 張手牌。進入：盲注完成。離開：發牌動畫/資料更新完成 → `BettingPreflop`。
+- `BettingPreflop`：Preflop 下注輪（UTG 開始；Heads-up 特例需符合 12 節）。進入：手牌已發。離開：
+	- 若只剩 1 人未棄牌：直接跳到 `Payout`（不需攤牌）。
+	- 若多人 all-in 導致後續無需下注：依序補公共牌到 River（經過 `DealFlop/DealTurn/DealRiver`，但略過各 `Betting*`）後 → `Showdown`。
+	- 正常情況下注輪結束 → `DealFlop`。
+- `DealFlop`：燒牌（若啟用）後發 3 張公共牌。進入：Preflop 輪結束且仍需繼續。離開：更新/動畫完成 → `BettingFlop`。
+- `BettingFlop`：Flop 下注輪（由 BTN 左手邊第一位仍在局玩家開始）。離開條件同 `BettingPreflop`，正常則 → `DealTurn`。
+- `DealTurn`：燒牌（若啟用）後發第 4 張公共牌（Turn）。進入：Flop 輪結束且仍需繼續。離開：更新/動畫完成 → `BettingTurn`。
+- `BettingTurn`：Turn 下注輪。離開條件同上，正常則 → `DealRiver`。
+- `DealRiver`：燒牌（若啟用）後發第 5 張公共牌（River）。進入：Turn 輪結束且仍需繼續。離開：更新/動畫完成 → `BettingRiver`。
+- `BettingRiver`：River 最後一輪下注。離開：
+	- 若只剩 1 人未棄牌：→ `Payout`。
+	- 否則（至少 2 人未棄牌）：→ `Showdown`。
+- `Showdown`：攤牌與比牌（評估 7 張牌取最佳 5 張），產生每個池（主池/邊池）的贏家列表。進入：River 輪結束且仍有多人未棄牌，或 all-in 補牌完成。離開：贏家已決定 → `Payout`。
+- `Payout`：依底池/邊池把籌碼發放給贏家，並套用 odd chip 規則（從 Button 左手邊順時針分配餘籌碼）。進入：有人直接獲勝或 Showdown 完成。離開：stack 更新完成、破產/離桌處理完成 → `HandSummary`。
+- `HandSummary`：顯示本手牌摘要（誰棄牌/誰攤牌、各池結果、贏得多少）。進入：Payout 完成。離開：使用者點下一手/自動倒數完成 → `NextHandOrExit`。
+- `NextHandOrExit`：判斷 Session 是否結束（人類 stack=0 失敗；或只剩人類勝利），否則推進到下一手（Button 輪轉、清理本手牌暫存資料）。進入：HandSummary 結束。離開：
+	- Session 結束：→ `MainMenu`。
+	- 繼續下一手：→ `TableSetup`（或依你實作可拆成「清理/下一手準備」，第一版先維持單一狀態即可）。
 
 每個狀態需定義：
 

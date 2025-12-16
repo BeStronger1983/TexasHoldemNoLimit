@@ -53,7 +53,7 @@
 - [x] **[Code][Config]** 建立 `GameConfig`（例如 `assets/Scripts/config/GameConfig.ts`）
 	- `startingStack`（預設 1000）
 	- `smallBlind` / `bigBlind`（預設 5 / 10）
-	- `ante`（預設 0，可開關）
+	- `ante`（預設 0，可開關；意指每手開始前「所有仍在局玩家」需先投入的固定額度，直接進底池；與盲注不同的是每位玩家都要付）
 	- `burnCardEnabled`（預設 true）
 	- `reopenOnShortAllinRaise`（預設 false，Spec §5.7）
 	- `aiDifficulty`、`aiThinkTimeMsMin/Max`、`aiThinkTimeEnabled`（Spec §7.2.5）
