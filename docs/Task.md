@@ -127,7 +127,7 @@
 
 ### T1.4 Debug/Replay 記錄輸出
 
-- [ ] **[Code][Test]** Debug 模式輸出（可寫到 console 或本機檔案/儲存）：
+- [x] **[Code][Test]** Debug 模式輸出（可寫到 console 或本機檔案/儲存）：
 	- 玩家數與座位/人類座位
 	- 洗牌後牌序或每次 draw 序列
 	- 行動序列（含金額）
