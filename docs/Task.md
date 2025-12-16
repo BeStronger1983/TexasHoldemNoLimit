@@ -172,9 +172,9 @@
 
 ### T2.3 行動順序（含 Heads-up 特例）
 
-- [ ] **[Code]** Preflop：從 BB 左手邊（UTG）開始（Spec §5.5）
-- [ ] **[Code]** Postflop：從 BTN 左手邊第一位仍在局玩家開始（Spec §5.5）
-- [ ] **[Code]** Heads-up 正確規則（Spec §12）：
+- [x] **[Code]** Preflop：從 BB 左手邊（UTG）開始（Spec §5.5）
+- [x] **[Code]** Postflop：從 BTN 左手邊第一位仍在局玩家開始（Spec §5.5）
+- [x] **[Code]** Heads-up 正確規則（Spec §12）：
 	- Button 同時是 SB
 	- Preflop：Button 先行
 	- Postflop：BB 先行
